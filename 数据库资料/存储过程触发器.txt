@@ -1,0 +1,410 @@
+SQL> create or replace procedure proc1
+  2  (p_vc1 varchar2(10),
+  3   p_vc2 varchar2(10),
+  4   p_vc3 varchar2(10))
+  5  As
+  6   v_vc1 varchar2(10);
+  7  begin
+  8   p_vc1:=
+  9  /
+
+警告: 创建的过程带有编译错误。
+
+SQL> edit
+已写入 file afiedt.buf
+
+  1  create or replace procedure proc1
+  2  (p_vc1 varchar2(10),
+  3   p_vc2 in varchar2(10),
+  4   p_vc3 in out varchar2(10))
+  5  As
+  6   v_vc1 varchar2(10);
+  7  begin
+  8   p_vc1:=p_vc1||'d';
+  9   v_vc1:=p_vc1;
+ 10   p_vc2:=p_vc2||'d';
+ 11   p_vc3:=p_vc3||'d';
+ 12   dbms_output.put_line(v_vc1);
+ 13   dbms_output.put_line(p_vc1);
+ 14   dbms_output.put_line(p_vc2);
+ 15   dbms_output.put_line(p_vc3);
+ 16* end;
+SQL> /
+
+警告: 创建的过程带有编译错误。
+
+SQL> show error
+PROCEDURE PROC1 出现错误: 
+
+LINE/COL ERROR                                                                  
+-------- -----------------------------------------------------------------      
+2/16     PLS-00103: 出现符号 "("在需要下列之一时：                              
+         := . ) , @ % default                                                   
+         character                                                              
+         符号 ":=" 被替换为 "(" 后继续。                                        
+                                                                                
+3/19     PLS-00103: 出现符号 "("在需要下列之一时：                              
+         := . ) , @ % default                                                   
+         character                                                              
+         符号 ":=" 被替换为 "(" 后继续。                                        
+                                                                                
+4/23     PLS-00103: 出现符号 "("在需要下列之一时：                              
+
+LINE/COL ERROR                                                                  
+-------- -----------------------------------------------------------------      
+         := . ) , @ % default                                                   
+         character                                                              
+         符号 ":=" 被替换为 "(" 后继续。                                        
+                                                                                
+SQL> edit
+已写入 file afiedt.buf
+
+  1  create or replace procedure proc1
+  2  (p_vc1 varchar2,
+  3   p_vc2 in varchar2,
+  4   p_vc3 in out varchar2)
+  5  As
+  6   v_vc1 varchar2(10);
+  7  begin
+  8   p_vc1:=p_vc1||'d';
+  9   v_vc1:=p_vc1;
+ 10   p_vc2:=p_vc2||'d';
+ 11   p_vc3:=p_vc3||'d';
+ 12   dbms_output.put_line(v_vc1);
+ 13   dbms_output.put_line(p_vc1);
+ 14   dbms_output.put_line(p_vc2);
+ 15   dbms_output.put_line(p_vc3);
+ 16* end;
+SQL> /
+
+警告: 创建的过程带有编译错误。
+
+SQL> show error
+PROCEDURE PROC1 出现错误: 
+
+LINE/COL ERROR                                                                  
+-------- -----------------------------------------------------------------      
+8/2      PL/SQL: Statement ignored                                              
+8/2      PLS-00363: 表达式 'P_VC1' 不能用作赋值目标                             
+10/2     PL/SQL: Statement ignored                                              
+10/2     PLS-00363: 表达式 'P_VC2' 不能用作赋值目标                             
+SQL> edit
+已写入 file afiedt.buf
+
+  1  create or replace procedure proc1
+  2  (p_vc1 varchar2,
+  3   p_vc2 in varchar2,
+  4   p_vc3 in out varchar2)
+  5  As
+  6   v_vc1 varchar2(10);
+  7  begin
+  8   --p_vc1:=p_vc1||'d';
+  9   v_vc1:=p_vc1;
+ 10   --p_vc2:=p_vc2||'d';
+ 11   p_vc3:=p_vc3||'d';
+ 12   dbms_output.put_line(v_vc1);
+ 13   dbms_output.put_line(p_vc1);
+ 14   dbms_output.put_line(p_vc2);
+ 15   dbms_output.put_line(p_vc3);
+ 16* end;
+SQL> /
+
+过程已创建。
+
+SQL> begin
+  2   proc1('abc','abc','abc');
+  3  end;
+  4  /
+ proc1('abc','abc','abc');
+                   *
+第 2 行出现错误: 
+ORA-06550: 第 2 行, 第 20 列: 
+PLS-00363: 表达式 'abc' 不能用作赋值目标
+ORA-06550: 第 2 行, 第 2 列: 
+PL/SQL: Statement ignored 
+
+
+SQL> declare
+  2   vc_1 varchar2(10):='abc';
+  3  /
+ vc_1 varchar2(10):='abc';
+                         *
+第 2 行出现错误: 
+ORA-06550: 第 2 行, 第 26 列: 
+PLS-00103: 出现符号 "end-of-file"在需要下列之一时： 
+begin function 
+package pragma procedure subtype type use <an identifier> 
+<a double-quoted delimited-identifier> form current cursor 
+
+
+SQL> edit
+已写入 file afiedt.buf
+
+  1  declare
+  2   vc_1 varchar2(10):='abc';
+  3   vc_2 varchar2(10):='abc';
+  4   vc_3 varchar2(10):='abc';
+  5  begin 
+  6    proc1(vc_1,vc_2,vc_3);
+  7* end;
+SQL> set serveroutput on
+SQL> /
+abc                                                                             
+abc                                                                             
+abc                                                                             
+abcd                                                                            
+
+PL/SQL 过程已成功完成。
+
+SQL> create or replace procedure proc1
+  2  (p_vc1 varchar2,
+  3   p_vc2 in varchar2,
+  4   p_vc3 in out varchar2)
+  5  As
+  6   v_vc1 varchar2(10);
+  7  begin
+  8   --p_vc1:=p_vc1||'d';
+  9   v_vc1:=p_vc1;
+ 10   --p_vc2:=p_vc2||'d';
+ 11   p_vc3:=p_vc3||'d';
+ 12   dbms_output.put_line(v_vc1);
+ 13   dbms_output.put_line(p_vc1);
+ 14   dbms_output.put_line(p_vc2);
+ 15   dbms_output.put_line(p_vc3);
+ 16  end;
+ 17  /
+
+过程已创建。
+
+SQL> edit
+已写入 file afiedt.buf
+
+  1  create or replace procedure proc1
+  2  (p_vc1 varchar2,
+  3   p_vc2 out varchar2,
+  4   p_vc3 in out varchar2)
+  5  As
+  6   v_vc1 varchar2(10);
+  7  begin
+  8   --p_vc1:=p_vc1||'d';
+  9   v_vc1:=p_vc1;
+ 10   p_vc2:=p_vc2||'d';
+ 11   p_vc3:=p_vc3||'d';
+ 12   dbms_output.put_line(v_vc1);
+ 13   dbms_output.put_line(p_vc1);
+ 14   dbms_output.put_line(p_vc2);
+ 15   dbms_output.put_line(p_vc3);
+ 16* end;
+SQL> /
+
+过程已创建。
+
+SQL>  declare
+  2    vc_1 varchar2(10):='abc';
+  3    vc_2 varchar2(10):='abc';
+  4    vc_3 varchar2(10):='abc';
+  5   begin
+  6     proc1(vc_1,vc_2,vc_3);
+  7   end;
+  8  /
+abc                                                                             
+abc                                                                             
+d                                                                               
+abcd                                                                            
+
+PL/SQL 过程已成功完成。
+
+SQL> DESC proc1
+PROCEDURE proc1
+参数名称                       类型                    输入/输出默认值?
+------------------------------ ----------------------- ------ --------
+ P_VC1                          VARCHAR2                IN    
+ P_VC2                          VARCHAR2                OUT   
+ P_VC3                          VARCHAR2                IN/OUT
+
+SQL> edit
+已写入 file afiedt.buf
+
+  1   begin
+  2     execute immediate 'create table test(
+  3  	c1 varchar2(10) primary key;
+  4          n1 number
+  5     )';
+  6*  end;
+  7  /
+ begin
+*
+第 1 行出现错误: 
+ORA-00911: 无效字符
+ORA-06512: 在 line 2 
+
+
+SQL> edit
+已写入 file afiedt.buf
+
+  1   begin
+  2     execute immediate 
+  3  	'create table test(
+  4  	c1 varchar2(10) primary key,
+  5          n1 number
+  6     )';
+  7*  end;
+SQL> /
+
+PL/SQL 过程已成功完成。
+
+SQL> desc test;
+ 名称                                      是否为空? 类型
+ ----------------------------------------- -------- ----------------------------
+ C1                                        NOT NULL VARCHAR2(10)
+ N1                                                 NUMBER
+
+SQL> drop table test
+  2  ;
+
+表已删除。
+
+SQL> create table test(
+  2   /
+create table test(
+                 *
+第 1 行出现错误: 
+ORA-00904: : 标识符无效 
+
+
+SQL> edit
+已写入 file afiedt.buf
+
+  1  create table test(
+  2   c1 number primary key,
+  3   c2 varchar2(10)
+  4* )
+SQL> /
+
+表已创建。
+
+SQL> insert into test(c2) values('abc');
+insert into test(c2) values('abc')
+*
+第 1 行出现错误: 
+ORA-01400: 无法将 NULL 插入 ("RJXY"."TEST"."C1") 
+
+
+SQL> create sequence my_seq
+  2  ;
+
+序列已创建。
+
+SQL> drop sequence my_seq;
+
+序列已删除。
+
+SQL> edit
+已写入 file afiedt.buf
+
+  1  create sequence my_seq
+  2  start with 1
+  3* increment by 1;
+  4  /
+increment by 1;
+              *
+第 3 行出现错误: 
+ORA-00911: 无效字符 
+
+
+SQL> edit
+已写入 file afiedt.buf
+
+  1  create sequence my_seq
+  2  start with 1
+  3* increment by 1
+SQL> /
+
+序列已创建。
+
+SQL> edit
+已写入 file afiedt.buf
+
+  1  Create or Replace Trigger tr_test
+  2  Before Insert on test
+  3         Begin
+  4     	 Select my_seq.nextval into :new.c1
+  5  	 From dual;
+  6*        End;
+  7  /
+Create or Replace Trigger tr_test
+                          *
+第 1 行出现错误: 
+ORA-04082: NEW 或 OLD 引用不允许在表级触发器中 
+
+
+SQL> edit
+已写入 file afiedt.buf
+
+  1  Create or Replace Trigger tr_test
+  2  Before Insert on test
+  3  For each row
+  4         Begin
+  5     	 Select my_seq.nextval into :new.c1
+  6  	 From dual;
+  7*        End;
+  8  /
+
+触发器已创建
+
+SQL> insert into test(c2) values('abc');
+
+已创建 1 行。
+
+SQL> select * from test;
+
+        C1 C2                                                                   
+---------- ----------                                                           
+         1 abc                                                                  
+
+SQL> insert into test(c2) values('bbb');
+
+已创建 1 行。
+
+SQL> insert into test(c2) values('ccc');
+
+已创建 1 行。
+
+SQL> select * from test;
+
+        C1 C2                                                                   
+---------- ----------                                                           
+         1 abc                                                                  
+         2 bbb                                                                  
+         3 ccc                                                                  
+
+SQL> edit
+已写入 file afiedt.buf
+
+  1  Create or Replace Trigger tr_test
+  2  Before Insert on test
+  3  For each row
+  4         Begin
+  5              Select my_seq.nextval into :new.c1
+  6      From dual;
+  7             Select 'aaa' into :new.c2
+  8      From dual;
+  9*        End;
+SQL> /
+
+触发器已创建
+
+SQL> insert into test(c2) values('aafr23r');
+
+已创建 1 行。
+
+SQL> select * from test;
+
+        C1 C2                                                                   
+---------- ----------                                                           
+         1 abc                                                                  
+         2 bbb                                                                  
+         3 ccc                                                                  
+         4 aaa                                                                  
+
+SQL> spool off

@@ -1,0 +1,128 @@
+Transact-SQL简明语法 
+Posted on 2007-12-01 11:02 凌晨风 阅读(363) 评论(0)  编辑  收藏 所属分类: Java学习笔记  
+最简单的查询语法格式:
+    SELECT <列名>
+    FROM <表名>
+    [WHERE <查询条件表达式>]
+    [ORDER BY <排序的列名> [ASC 或 DESC]]
+·查询所有的数据行和列:
+    SELECT * FROM Student
+·查询部分行列－－条件查询
+    SELECT SCode,SName,SAddress 
+    FROM Student
+    WHERE SAddress = '陕西咸阳'()
+    ★<>为不等于符号
+    SELECT SCode,SName,SAddress 
+    FROM Student
+    WHERE SAddress <> '陕西咸阳'
+    ★合并的新列名
+    SELECT FirstName+'.'+LastName AS '姓名'
+    FROM Employees
+或
+    SELECT '姓名' = FirstName+'.'+LastName
+    FROM Employees
+·查询空行
+    SELECT SName FROM Student WHERE SEmail IS NULL
+·查询中使用常量列
+    ★查询输出多了一列"学校名称"，该列的所有数据都是"陕西咸阳"
+    SELECT 姓名=SName,地址=SAddrees,'陕西咸阳' AS 学校名称
+·查询贩货限制的行数
+    ★TOP为限制行数的关键字
+    SELECT TOP 5 SName,SAddreess
+    FROM Student WHERE SSex=0
+    ★百分比限制关键字PERCENT
+    SELECT TOP 20 PERCENT SName,SAddrees
+    FROM Student WHERE SSex = 0
+
+·查询排序
+    ★降低10%再加5，按照及格成绩排列
+    SELECT StudentID AD 学员编号，(Score*0.9+5) AS 综合成绩
+    FROM Score
+    WHERE (Score*0.9+5)>60
+    ORDER BY Score
+    ★合并查到的所有姓名信息，然后按照姓名降序排列
+    SELECT Au_Lname + '.' + Au_Fname AS EMP FROM Author UNION
+    SELECT Fname + '.' + Lname AS EMP FROM Employee
+    ORDER BY EMP DESC
+    ★多字段排序
+    SELECT StudentID AS 学员编号,Score AS 成绩
+    FROM Score
+    WHERE Score > 60
+    ORDER BY Score,CourseID(这两的字段有先后顺序)
+·查询中使用函数
+    ★更新信息,从表Card中把字段password中o改为0，i改为1
+    UPDATE Card SET password = REPLACE(密码,'o','0')
+    UPDATE Card SET password = REPLACE(密码,'i','1')
+    或
+    UPDATE Card SET password = REPLACE(REPLACE(密码,'o','0'),'i','1')
+    ★特殊排序
+    排序前:13-1,13-2,13-3,13-10,13-100,13-108,13-18,13-11,13-15,14-1,14-2
+    排序后:13-1,13-2,13-3,13-10,13-11,13-15,13-18,13-100,13-108,14-1,14-2
+    SELCT ListNumber
+    FROM SellRecord
+    ORDER BY Convert(int,Left(ListNumber,Charindex('-',ListNumber)-1)),
+    Convert(int,Stuff(ListNumber,1,Charindex('-',ListNumber),''))
+·模糊查询
+    ★使用LIKE进行模糊查询
+    SELECT * FROM Student WHERE SName LIKE '王%'
+    ★使用BETWEEN在某个范围内进行查询
+    SELECT * FROM SCore WHERE Score BETWEEN 60 AND 80
+    ★查询不在1992年8月1号到1993年8月1号之间订购的读书列表
+    SELELCT * FROM Sales WHERE ord_date NOT BETWEEN '1992-8-1' AND '1993-8-1'
+    ★使用IN在列举值内进行查询
+    SELECT SName AS 学员姓名 FROM Student WHERE SAddress IN ('北京','广州','上海')
+    ORDER BY SAddress
+·SQL Server 中的聚合函数
+    ★SUM(只能返回一个数值)
+    SELECT SUM(ytd_sales) FROM tiles WHERE tyde = 'business'
+    ★AVG
+    SELECT AVG(SCore) AS 平均成绩 FROM Score WHERE Score >=60
+    ★MAX、MIN
+    SELECT AVG(Score) AS 平均成绩,MAX(Score) AS 最高分,MIN(Score) AS 最低分
+    FROM Score WHERE Score >=60
+    ★COUNT(返回提供的表达式中非空值的计数，可以用数字和字符类型的列)
+    SELELCT COUNT(*) AS 及格人数 FROM Score WHERE Score >=60
+·分组查询
+    ★使用GROUP BY进行分组查询
+    SELECT CourseID,AVG(Score) AS 课程平均成绩
+    FROM Score
+    GROUP BY CourseID
+·多表连接查询
+    ★内连接
+    SELECT Student,SName,Score.CourseID,Score.Score
+    FROM Student,Score
+    WHERE Student.Score = Score.StudentID
+或
+    SELECT S.SName,C.CourseID,C.Score
+    FROM Student AS S INNER JOIN Score AS C
+    ON (S.Score=C.StudentID)
+    ★三表连接查询
+    SELECT S.SName AS 学员姓名,CS.CourseName AS 课程名称,C.Score AS 考试成绩
+    FROM Student AS S
+    INNER JOIN Score AS C ON (S.Score=C.StudentID)
+    INNER JOIN Course AS CS ON (CS.CourseID=C.CourseID)
+    ★左外连接查询
+    SELECT S.SName,C.CourseID,C.Score
+    FROM Student AS S
+    LEFT OUTER JOIN Score AS C ON S.Score = C.StudentID
+    ★右外连接查询
+    SELECT Titles.Title_id,Titles.Title,Publishers.Pub_name
+    FROM titles
+    RIGHT OUTER JOIN Publishers ON Titles.Pub_id = Publishers.Pub_id
+·案例分析
+    ★★查询一张表中的奇数和偶数行
+    1、只能依靠标识列的值来进行判断和选取
+    2、数据行可能存在增加，修改和删除，因此标识列的数据值并不完全可靠
+    3、SELECTINTO创建一张新表，顺便创建新的表示列，再在新的表示列上执行奇偶判断
+    4、奇数的判断依据为：标识列值%2不等与0；偶数的判断依据为：标识列值%2等于0
+    5、删除临时表TEMPTABLE
+
+    SELECT A,TDENTITY(INT 1,1) AS ID
+    INTO TEMPTABLE
+    FROM TBL
+    
+    SELECT SUM(A) AS 奇数列汇总 FROM TEMPTABLE
+    WHERE ID%2 <> 0
+
+    SELECT SUM(A) AS 偶数列汇总 FROM TEMPTABLE
+    WHERE ID%2 = 0
